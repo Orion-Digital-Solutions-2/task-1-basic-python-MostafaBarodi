@@ -1,0 +1,32 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Check Welcome Message
+      id: check-welcome-message
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Check Welcome Message
+        setup-command: ''
+        command: python main.py
+        input: ''
+        expected-output: Welcome to the team!
+        comparison-method: exact
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        CHECK-WELCOME-MESSAGE_RESULTS: "${{steps.check-welcome-message.outputs.result}}"
+      with:
+        runners: check-welcome-message
